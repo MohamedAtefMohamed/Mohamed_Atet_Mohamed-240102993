@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Flix - Your premier destination for streaming movies, TV series, and cartoons">
+    <title>Stream Movies, Series & Cartoons</title>
+    <!-- GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- OWL CAROUSEL -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" integrity="sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g==" crossorigin="anonymous" />
+    <!-- BOX ICONS -->
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+    <!-- APP CSS -->
+    <link rel="stylesheet" href="grid.css">
+    <link rel="stylesheet" href="app.css">
+    <style>
+        /* Organized Movie Grid Layout */
+        .movies-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            padding: 0 20px;
+        }
+        
+        .movies-grid-container .movie-item {
+            background: var(--box-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: block;
+        }
+        
+        .movies-grid-container .movie-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .movies-grid-container .movie-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .movies-grid-container .movie-item-content {
+            padding: 15px;
+        }
+        
+        .movies-grid-container .movie-item-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .movies-grid-container .movie-infos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .movies-grid-container .movie-info {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        /* Section Header Styling */
+        .section-header {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-transform: capitalize;
+        }
+        
+        /* Toggle between Grid and Carousel */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: flex-end;
+        }
+        
+        .view-toggle button {
+            padding: 8px 15px;
+            background: var(--box-bg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .view-toggle button.active {
+            background: var(--main-color);
+            border-color: var(--main-color);
+        }
+        
+        .view-toggle button:hover {
+            background: var(--main-color);
+        }
+        
+        /* Hide carousel when grid is active */
+        .section.grid-view .movies-slide {
+            display: none;
+        }
+        
+        .section.grid-view .movies-grid-container {
+            display: grid;
+        }
+        
+        .section.carousel-view .movies-grid-container {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .movies-grid-container {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="nav-wrapper" role="navigation" aria-label="Main navigation">
+        <div class="container">
+            <div class="nav">
+                <a href="index.html" class="logo" aria-label="Flix Home">
+                    <i class='bx bx-movie-play bx-tada main-color' aria-hidden="true"></i>Fl<span class="main-color">i</span>x
+                </a>
+                <ul class="nav-menu" id="nav-menu" role="menubar">
+                    <li role="none"><a href="#home" role="menuitem">Home</a></li>
+                    <li role="none"><a href="#genre" role="menuitem">Genre</a></li>
+                    <li role="none"><a href="#movies" role="menuitem">Movies</a></li>
+                    <li role="none"><a href="#series" role="menuitem">Series</a></li>
+                    <li role="none"><a href="#about" role="menuitem">About</a></li>
+                    <li role="none" class="search-container">
+                        <form action="search.php" method="GET" role="search" aria-label="Search movies and series">
+                            <input type="search" name="q" id="search-input" placeholder="Search..." aria-label="Search input" autocomplete="off">
+                            <button type="submit" aria-label="Submit search">
+                                <i class="bx bx-search" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </li>
+                    <li role="none">
+                        <a href="login.php" class="btn btn-hover" role="menuitem">
+                            <span>Sign in</span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- MOBILE MENU TOGGLE -->
+                <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <div class="hamburger"></div>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section" id="home" role="banner">
+    <header class="hero-section" id="home" role="banner">
+        <!-- HERO SLIDE -->
+        <div class="hero-slide">
+            <div class="owl-carousel carousel-nav-center" id="hero-carousel">
+                <!-- SLIDE ITEM -->
+                <div class="hero-slide-item">
+                    <img src="./images/black-banner.png" alt="">
+                    <div class="overlay"></div>
+                    <div class="hero-slide-item-content">
+                        <div class="item-content-wraper">
+                            <div class="item-content-title top-down">
+                                Black Panther
+                            </div>
+                            <div class="movie-infos top-down delay-2">
+                                <div class="movie-info">
+                                    <i class="bx bxs-star"></i>
+                                    <span>9.5</span>
+                                </div>
+                                <div class="movie-info">
+                                    <i class="bx bxs-time"></i>
+                                    <span>120 mins</span>
+                                </div>
+                                <div class="movie-info">
+                                    <span>HD</span>
+                                </div>
+                                <div class="movie-info">
+                                    <span>16+</span>
+                                </div>
+                            </div>
+                            <div class="item-content-description top-down delay-4">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas, possimus eius. Deserunt non odit, cum vero reprehenderit laudantium odio vitae autem quam, incidunt molestias ratione mollitia accusantium, facere ab suscipit.
+                            </div>
+                            <div class="item-action top-down delay-6">
+                                <a href="#" class="btn btn-hover">
+                                    <i class="bx bxs-right-arrow"></i>
+                                    <span>Watch now</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END SLIDE ITEM -->
+                <!-- SLIDE ITEM -->
+                <div class="hero-slide-item">
+                    <img src="./images/supergirl-banner.jpg" alt="">
+                    <div class="overlay"></div>
+                    <div class="hero-slide-item-content">
+                        <div class="item-content-wraper">
+                            <div class="item-content-title top-down">
+                                Supergirl
+                            </div>
+                            <div class="movie-infos top-down delay-2">
+                                <div class="movie-info">
+                                    <i class="bx bxs-star"></i>
+                                    <span>9.5</span>
+                                </div>
+                                <div class="movie-info">
+                                    <i class="bx bxs-time"></i>
+                                    <span>120 mins</span>
+                                </div>
+                                <div class="movie-info">
+                                    <span>HD</span>
+                                </div>
+                                <div class="movie-info">
+                                    <span>16+</span>
+                                </div>
+                            </div>
+                            <div class="item-content-description top-down delay-4">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas, possimus eius. Deserunt non odit, cum vero reprehenderit laudantium odio vitae autem quam, incidunt molestias ratione mollitia accusantium, facere ab suscipit.
+                            </div>
+                            <div class="item-action top-down delay-6">
+                                <a href="#" class="btn btn-hover">
+                                    <i class="bx bxs-right-arrow"></i>
+                                    <span>Watch now</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END SLIDE ITEM -->
+                <!-- SLIDE ITEM -->
+                <div class="hero-slide-item">
+                    <img src="./images/wanda-banner.jpg" alt="">
+                    <div class="overlay"></div>
+                    <div class="hero-slide-item-content">
+                        <div class="item-content-wraper">
+                            <div class="item-content-title top-down">
+                                Wanda Vision
+                            </div>
+                            <div class="movie-infos top-down delay-2">
+                                <div class="movie-info">
+                                    <i class="bx bxs-star"></i>
+                                    <span>9.5</span>
+                                </div>
+                                <div class="movie-info">
+                                    <i class="bx bxs-time"></i>
+                                    <span>120 mins</span>
+                                </div>
+                                <div class="movie-info">
+                                    <span>HD</span>
+                                </div>
+                                <div class="movie-info">
+                                    <span>16+</span>
+                                </div>
+                            </div>
+                            <div class="item-content-description top-down delay-4">
+                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas, possimus eius. Deserunt non odit, cum vero reprehenderit laudantium odio vitae autem quam, incidunt molestias ratione mollitia accusantium, facere ab suscipit.
+                            </div>
+                            <div class="item-action top-down delay-6">
+                                <a href="#" class="btn btn-hover">
+                                    <i class="bx bxs-right-arrow"></i>
+                                    <span>Watch now</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END SLIDE ITEM -->
+            </div>
+        </div>
+        <div class="top-movies-slide">
+            <div class="owl-carousel" id="top-movies-slide">
+                <!-- MOVIE ITEM -->
+                <div class="movie-item">
+                    <img src="./images/series/supergirl.jpg" alt="">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">
+                            Supergirl
+                        </div>
+                        <div class="movie-infos">
+                            <div class="movie-info">
+                                <i class="bx bxs-star"></i>
+                                <span>9.5</span>
+                            </div>
+                            <div class="movie-info">
+                                <i class="bx bxs-time"></i>
+                                <span>120 mins</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>HD</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>16+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MOVIE ITEM -->
+                <!-- MOVIE ITEM -->
+                <div class="movie-item">
+                    <img src="./images/movies/captain-marvel.png" alt="">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">
+                            Captain Marvel
+                        </div>
+                        <div class="movie-infos">
+                            <div class="movie-info">
+                                <i class="bx bxs-star"></i>
+                                <span>9.5</span>
+                            </div>
+                            <div class="movie-info">
+                                <i class="bx bxs-time"></i>
+                                <span>120 mins</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>HD</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>16+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MOVIE ITEM -->
+                <!-- MOVIE ITEM -->
+                <div class="movie-item">
+                    <img src="./images/cartoons/demon-slayer.jpg" alt="">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">
+                            Infinity Train
+                        </div>
+                        <div class="movie-infos">
+                            <div class="movie-info">
+                                <i class="bx bxs-star"></i>
+                                <span>9.5</span>
+                            </div>
+                            <div class="movie-info">
+                                <i class="bx bxs-time"></i>
+                                <span>120 mins</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>HD</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>16+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MOVIE ITEM -->
+                <!-- MOVIE ITEM -->
+                <div class="movie-item">
+                    <img src="./images/movies/blood-shot.jpg" alt="">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">
+                            Bloodshot
+                        </div>
+                        <div class="movie-infos">
+                            <div class="movie-info">
+                                <i class="bx bxs-star"></i>
+                                <span>9.5</span>
+                            </div>
+                            <div class="movie-info">
+                                <i class="bx bxs-time"></i>
+                                <span>120 mins</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>HD</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>16+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MOVIE ITEM -->
+                <!-- MOVIE ITEM -->
+                <div class="movie-item">
+                    <img src="./images/series/wanda.png" alt="">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">
+                            Wanda Vision
+                        </div>
+                        <div class="movie-infos">
+                            <div class="movie-info">
+                                <i class="bx bxs-star"></i>
+                                <span>9.5</span>
+                            </div>
+                            <div class="movie-info">
+                                <i class="bx bxs-time"></i>
+                                <span>120 mins</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>HD</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>16+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MOVIE ITEM -->
+                <!-- MOVIE ITEM -->
+                <div class="movie-item">
+                    <img src="./images/movies/bat-man.jpg" alt="">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">
+                            The Dark Knight
+                        </div>
+                        <div class="movie-infos">
+                            <div class="movie-info">
+                                <i class="bx bxs-star"></i>
+                                <span>9.5</span>
+                            </div>
+                            <div class="movie-info">
+                                <i class="bx bxs-time"></i>
+                                <span>120 mins</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>HD</span>
+                            </div>
+                            <div class="movie-info">
+                                <span>16+</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END MOVIE ITEM -->
+            </div>
+        </div>
+    </header>
+
+    <main role="main">
+    <section class="section grid-view" id="movies" aria-labelledby="movies-heading">
+        <div class="container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 class="section-header" id="movies-heading">
+                    latest movies
+                </h2>
+                <div class="view-toggle">
+                    <button onclick="toggleView('movies', 'grid')" class="active">Grid</button>
+                    <button onclick="toggleView('movies', 'carousel')">Carousel</button>
+                </div>
+            </div>
+            <div class="movies-grid-container" id="moviesGridContainer">
+                <div class="loading" style="grid-column: 1 / -1; text-align: center; padding: 40px;">Loading movies...</div>
+            </div>
+            <div class="movies-slide carousel-nav-center owl-carousel" id="moviesCarousel" style="display: none;">
+                <!-- Movies will be loaded dynamically -->
+            </div>
+        </div>
+    </div>
+    <!-- END LATEST MOVIES SECTION -->
+    </section>
+
+
+    <!-- SPECIAL MOVIE SECTION -->
+    <section class="section" aria-labelledby="featured-heading">
+        <div class="hero-slide-item">
+            <img src="./images/transformer-banner.jpg" alt="">
+            <div class="overlay"></div>
+            <div class="hero-slide-item-content">
+                <div class="item-content-wraper">
+                    <div class="item-content-title">
+                        Transformer
+                    </div>
+                    <div class="movie-infos">
+                        <div class="movie-info">
+                            <i class="bx bxs-star"></i>
+                            <span>9.5</span>
+                        </div>
+                        <div class="movie-info">
+                            <i class="bx bxs-time"></i>
+                            <span>120 mins</span>
+                        </div>
+                        <div class="movie-info">
+                            <span>HD</span>
+                        </div>
+                        <div class="movie-info">
+                            <span>16+</span>
+                        </div>
+                    </div>
+                    <div class="item-content-description">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quas, possimus eius. Deserunt non odit, cum vero reprehenderit laudantium odio vitae autem quam, incidunt molestias ratione mollitia accusantium, facere ab suscipit.
+                    </div>
+                    <div class="item-action">
+                        <a href="#" class="btn btn-hover">
+                            <i class="bx bxs-right-arrow"></i>
+                            <span>Watch now</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <footer class="section" role="contentinfo">
+    <footer class="section" role="contentinfo">
+        <div class="container">
+            <div class="row">
+                <div class="col-4 col-md-6 col-sm-12">
+                    <div class="content">
+                        <a href="index.html" class="logo" aria-label="Flix Home">
+                            <i class='bx bx-movie-play bx-tada main-color' aria-hidden="true"></i>Fl<span class="main-color">i</span>x
+                        </a>
+                        <p>
+                            Flix is your premier destination for streaming movies, TV series, and cartoons. Discover the latest releases and timeless classics all in one place.
+                        </p>
+                        <div class="social-list" role="list">
+                            <a href="https://facebook.com" class="social-item" aria-label="Visit our Facebook page" target="_blank" rel="noopener noreferrer">
+                                <i class="bx bxl-facebook" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://twitter.com" class="social-item" aria-label="Visit our Twitter page" target="_blank" rel="noopener noreferrer">
+                                <i class="bx bxl-twitter" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://instagram.com" class="social-item" aria-label="Visit our Instagram page" target="_blank" rel="noopener noreferrer">
+                                <i class="bx bxl-instagram" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-8 col-md-6 col-sm-12">
+                    <div class="row">
+                        <div class="col-3 col-md-6 col-sm-6">
+                            <div class="content">
+                                <p><b>Flix</b></p>
+                                <ul class="footer-menu">
+                                    <li><a href="#about">About us</a></li>
+                                    <li><a href="profile.php">My profile</a></li>
+                                    <li><a href="#contact">Contacts</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-6 col-sm-6">
+                            <div class="content">
+                                <p><b>Browse</b></p>
+                                <ul class="footer-menu">
+                                    <li><a href="#movies">Movies</a></li>
+                                    <li><a href="#series">Series</a></li>
+                                    <li><a href="#cartoons">Cartoons</a></li>
+                                    <li><a href="#genre">Genres</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-6 col-sm-6">
+                            <div class="content">
+                                <p><b>Help</b></p>
+                                <ul class="footer-menu">
+                                    <li><a href="help.php">FAQ</a></li>
+                                    <li><a href="help.php#support">Support</a></li>
+                                    <li><a href="help.php#terms">Terms of Service</a></li>
+                                    <li><a href="help.php#privacy">Privacy Policy</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-3 col-md-6 col-sm-6">
+                            <div class="content">
+                                <p><b>Download app</b></p>
+                                <ul class="footer-menu">
+                                    <li>
+                                        <a href="https://play.google.com" aria-label="Download Flix app from Google Play" target="_blank" rel="noopener noreferrer">
+                                            <img src="./images/google-play.png" alt="Get it on Google Play">
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://apps.apple.com" aria-label="Download Flix app from App Store" target="_blank" rel="noopener noreferrer">
+                                            <img src="./images/app-store.png" alt="Download on the App Store">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="copyright">
+    <div class="copyright">
+        Copyright &copy; <span id="current-year">2024</span> Flix. All rights reserved.
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" integrity="sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==" crossorigin="anonymous"></script>
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        async function loadMoviesFromAPI() {
+            try {
+                const res = await fetch('api/movies.php');
+                const text = await res.text();
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                
+                const data = JSON.parse(text);
+                
+                if (data.success && data.data) {
+                    displayMoviesInGrid(data.data);
+                    displayMoviesInCarousel(data.data);
+                } else {
+                    document.getElementById('moviesGridContainer').innerHTML = 
+                        '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;">No movies found. Check back later!</div>';
+                }
+            } catch (error) {
+                console.error('Error loading movies:', error);
+                document.getElementById('moviesGridContainer').innerHTML = 
+                    '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #dc3545;">Error loading movies. Please refresh the page.</div>';
+            }
+        }
+        
+        function displayMoviesInGrid(movies) {
+            const container = document.getElementById('moviesGridContainer');
+            
+            if (movies.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px;">No movies available yet.</div>';
+                return;
+            }
+            
+            container.innerHTML = movies.map(movie => `
+                <a href="movie-details.php?id=${movie.id}" class="movie-item">
+                    <img src="${movie.poster_url || './images/black-banner.png'}" alt="${movie.title}" onerror="this.src='./images/black-banner.png'">
+                    <div class="movie-item-content">
+                        <div class="movie-item-title">${movie.title}</div>
+                        <div class="movie-infos">
+                            <div class="movie-info"><i class="bx bxs-star"></i><span>${movie.rating || '0'}</span></div>
+                            ${movie.duration ? `<div class="movie-info"><i class="bx bxs-time"></i><span>${movie.duration} mins</span></div>` : ''}
+                            <div class="movie-info"><span>HD</span></div>
+                            <div class="movie-info"><span>16+</span></div>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+        }
+        
+        function displayMoviesInCarousel(movies) {
+            const carousel = document.getElementById('moviesCarousel');
+            
+            if (movies.length === 0) {
+                carousel.innerHTML = '<div style="text-align: center; padding: 40px;">No movies available.</div>';
+                return;
+            }
+            
+            carousel.innerHTML = movies.map(movie => `
+                <article class="movie-item">
+                    <a href="movie-details.php?id=${movie.id}">
+                        <img src="${movie.poster_url || './images/black-banner.png'}" alt="${movie.title}" onerror="this.src='./images/black-banner.png'">
+                        <div class="movie-item-content">
+                            <div class="movie-item-title">${movie.title}</div>
+                            <div class="movie-infos">
+                                <div class="movie-info"><i class="bx bxs-star"></i><span>${movie.rating || '0'}</span></div>
+                                ${movie.duration ? `<div class="movie-info"><i class="bx bxs-time"></i><span>${movie.duration} mins</span></div>` : ''}
+                                <div class="movie-info"><span>HD</span></div>
+                                <div class="movie-info"><span>16+</span></div>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            `).join('');
+            
+            if (typeof $ !== 'undefined' && $.fn.owlCarousel) {
+                $('#moviesCarousel').owlCarousel({
+                    items: 2,
+                    dots: false,
+                    nav: true,
+                    margin: 15,
+                    loop: true,
+                    responsive: {
+                        0: { items: 1 },
+                        500: { items: 2 },
+                        768: { items: 3 },
+                        1280: { items: 4 },
+                        1600: { items: 6 }
+                    }
+                });
+            }
+        }
+        
+        function toggleView(sectionId, view) {
+            const section = document.getElementById(sectionId).closest('.section');
+            const buttons = section.querySelectorAll('.view-toggle button');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (view === 'grid') {
+                section.classList.remove('carousel-view');
+                section.classList.add('grid-view');
+                document.getElementById('moviesGridContainer').style.display = 'grid';
+                document.getElementById('moviesCarousel').style.display = 'none';
+            } else {
+                section.classList.remove('grid-view');
+                section.classList.add('carousel-view');
+                document.getElementById('moviesGridContainer').style.display = 'none';
+                document.getElementById('moviesCarousel').style.display = 'block';
+                
+                if (typeof $ !== 'undefined' && $.fn.owlCarousel) {
+                    $('#moviesCarousel').trigger('destroy.owl.carousel');
+                    $('#moviesCarousel').owlCarousel({
+                        items: 2,
+                        dots: false,
+                        nav: true,
+                        margin: 15,
+                        loop: true,
+                        responsive: {
+                            0: { items: 1 },
+                            500: { items: 2 },
+                            768: { items: 3 },
+                            1280: { items: 4 },
+                            1600: { items: 6 }
+                        }
+                    });
+                }
+            }
+        }
+        
+        loadMoviesFromAPI();
+    </script>
+
+</body>
+
+</html>
